@@ -78,14 +78,15 @@ class LICALearner:
         # Optimise agents
         self.agent_optimiser.zero_grad()
         mix_loss.backward()
-        grad_norm = th.nn.utils.clip_grad_norm_(self.agent_params, self.args.grad_norm_clip)
+        if self.args.grad_norm_clip:
+            grad_norm = th.nn.utils.clip_grad_norm_(self.agent_params, self.args.grad_norm_clip)
         self.agent_optimiser.step()
 
-        if t_env - self.log_stats_t_agent >= self.args.learner_log_interval:
-            self.logger.log_stat("mix_loss", mix_loss.item(), t_env)
-            self.logger.log_stat("entropy", entropy_loss.item(), t_env)
-            self.logger.log_stat("agent_grad_norm", grad_norm, t_env)
-            self.log_stats_t_agent = t_env
+        # if t_env - self.log_stats_t_agent >= self.args.learner_log_interval:
+        #     self.logger.log_stat("mix_loss", mix_loss.item(), t_env)
+        #     self.logger.log_stat("entropy", entropy_loss.item(), t_env)
+        #     self.logger.log_stat("agent_grad_norm", grad_norm, t_env)
+        #     self.log_stats_t_agent = t_env
 
 
     def train_critic_td(self, batch: EpisodeBatch, t_env: int, episode_num: int):
@@ -125,7 +126,7 @@ class LICALearner:
         loss.backward()
         grad_norm = th.nn.utils.clip_grad_norm_(self.critic_params, self.args.grad_norm_clip)
         self.critic_optimiser.step()
-        self.critic_training_steps += 1
+        # self.critic_training_steps += 1
 
         running_log["critic_loss"].append(loss.item())
         running_log["critic_grad_norm"].append(grad_norm)
@@ -146,7 +147,7 @@ class LICALearner:
 
     def _update_targets(self):
         self.target_critic.load_state_dict(self.critic.state_dict())
-        self.logger.console_logger.info("Updated target network")
+        #self.logger.console_logger.info("Updated target network")
 
     def cuda(self):
         self.mac.cuda()
