@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import os
 import collections
 from os.path import dirname, abspath
@@ -12,6 +13,7 @@ from utils.logging import get_logger
 import yaml
 
 from run import run
+
 
 SETTINGS['CAPTURE_MODE'] = "fd" # set to "no" if you want to see stdout/stderr in console
 logger = get_logger()
@@ -28,7 +30,9 @@ def my_main(_run, _config, _log):
     # Setting the random seed throughout the modules
     config = config_copy(_config)
     np.random.seed(config["seed"])
+    random.seed(config["seed"])
     th.manual_seed(config["seed"])
+    th.set_num_threads(1)
     config['env_args']['seed'] = config["seed"]
 
     # run the framework
